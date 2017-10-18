@@ -10,37 +10,48 @@ cost_support_inf = 10
 cost_support_sup = 100
 
 
-def simul(a):
+def bid_function(a, b, c):
+	return a + b*c
+
+def bid(c, cap, a, b):
+	bid = bid_function(a, b, c)
+	if bid > cap:
+		bid = cap
+	if bid < c:
+		bid = c
+	return bid
+
+def auction(a, b, a_next, b_next):
 	bids = []
-	profits = []
 	i = 0
 	while i < n_bidders:
 		c = np.random.random_integers(cost_support_inf,cost_support_sup)
 		c_hat = c + np.random.random_integers(-error,error)
 		cap = c_hat + markup
-		b = bid(c, cap)
-		bids.append(b)
-		bids.sort()
-		k = 0
-		while k < n_demand:
-			b = bids[k]
-			if b > c:
-				profit = b - c
-				profits.append(profit)
- 			k = k + 1
+		if i == 0:
+			bid = bid(c, cap, a_next, b_next)
+			profit = bid - c
+		else:
+			bids.append(bid(c, cap, a, b))
 		i = i + 1
-	return profits
+	i = 0
+	k = 0
+	for x in bids:
+		if x < bid:
+			i = i + 1
+		if x == bid:
+			k = k + 1
+	if i >= n_demand:
+		profit = 0
+	if i + k > n_demand:
+		profit = profit * float(n_demand - i)/k
+	return profit
 
-def bid_function(c):
-	a = 20 # in the cost support 
-	b = 0.5 # debe ser b < 1
-	return a + b*c
+a = 20
+b = 0.5
+	s_profit = 0
+	for k in range(n_simul):
+		s_profit = s_profit + auction(a, b, a_next, b_next)
+	m_profit = float(s_profit)/n_simul	
 
-def bid(c, cap):
-	if bid_function(c) < cap:
-		b = cap
-	elif bid_function(c) < c:
-		b = c
-	else:
-		b = bid_function(c)
-	return b
+
