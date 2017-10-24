@@ -62,6 +62,7 @@ def optim(a, b):
 				s_profit = s_profit + auction(a, b, a_next, b_next)
 			m_profit = float(s_profit)/n_simul
 			if m_profit > prev_profit:
+				prev_profit = m_profit
 				a_optim = a_next
 				b_optim = b_next
 	return (a_optim, b_optim)
